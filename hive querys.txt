@@ -1,0 +1,52 @@
+-- 1. Category-wise avg ratings
+SELECT categoryName, AVG(stars) AS avg_rating
+FROM cleaned_amazon_data
+GROUP BY categoryName
+ORDER BY avg_rating DESC;
+
+-- 2. Price distribution (bucketing)
+SELECT
+    CASE
+        WHEN price < 10  THEN '<$10'
+        WHEN price < 25  THEN '$10-25'
+        WHEN price < 50  THEN '$25-50'
+        WHEN price < 100 THEN '$50-100'
+        WHEN price < 250 THEN '$100-250'
+        WHEN price < 500 THEN '$250-500'
+        ELSE '$500+'
+    END AS price_segment,
+    COUNT(*) AS product_count
+FROM cleaned_amazon_data
+GROUP BY
+    CASE
+        WHEN price < 10  THEN '<$10'
+        WHEN price < 25  THEN '$10-25'
+        WHEN price < 50  THEN '$25-50'
+        WHEN price < 100 THEN '$50-100'
+        WHEN price < 250 THEN '$100-250'
+        WHEN price < 500 THEN '$250-500'
+        ELSE '$500+'
+    END;
+
+-- 3. Bestseller trends by category
+SELECT categoryName, COUNT(*) AS bestseller_count
+FROM cleaned_amazon_data
+WHERE isBestSeller = 1
+GROUP BY categoryName
+ORDER BY bestseller_count DESC;
+
+-- 4. Demand by category
+SELECT categoryName, SUM(boughtInLastMonth) AS total_units
+FROM cleaned_amazon_data
+GROUP BY categoryName
+ORDER BY total_units DESC;
+
+-- 5. Popularity score vs price diff
+SELECT
+    categoryName,
+    AVG(popularity_score) AS avg_popularity,
+    AVG(price_diff)       AS avg_price_diff,
+    COUNT(*)              AS product_count
+FROM cleaned_amazon_data
+GROUP BY categoryName
+ORDER BY avg_popularity DESC;
